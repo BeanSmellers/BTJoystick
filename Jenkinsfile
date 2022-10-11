@@ -16,7 +16,7 @@ pipeline {
     post {
         always {
             archiveArtifacts 'app/build/outputs/apk/**/*.apk'
-            archiveArtifacts 'app/build/outputs/reports/tests/testDebugUnitTest/**/*'
+            archiveArtifacts 'app/build/outputs/reports/tests/testDebugUnitTest/*'
         }
     }
 }
