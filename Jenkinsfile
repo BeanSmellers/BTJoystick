@@ -14,9 +14,8 @@ pipeline {
     }
 
     post {
-        always {
+        success {
             archiveArtifacts 'app/build/outputs/apk/**/*.apk'
-            archiveArtifacts 'app/build/reports/tests/testDebugUnitTest/**/*.*'
         }
     }
 }
