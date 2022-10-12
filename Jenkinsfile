@@ -59,12 +59,13 @@ pipeline {
                 echo "Creating release..."
                 withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
                     script {
+                        def escaped_msg = MSG_JSON['body'].replace("'", "\\'") // Replace ' with \'
                         sh """#!/bin/bash
                         DATA='{
                             "tag_name": "${NEXT_VER}",
                             "target_commitish": "main",
                             "name": "${MSG_JSON['name']}",
-                            "body": "${MSG_JSON['body']}"
+                            "body": "${escaped_msg}"
                         }'
                         curl -X POST --data "\$DATA" -H "Authorization: Bearer \$TOKEN" "https://api.github.com/repos/BeanSmellers/BTJoystick/releases"
                     """
