@@ -51,7 +51,7 @@ pipeline {
                                             "previous_tag_name": "${lastRelVer}"
                                             }"""
                         def msgOut = httpRequest httpMode: 'POST', requestBody: body,
-                                        customHeaders: [[Authorization: "Bearer ${TOKEN}"]],
+                                        customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
                                         url: "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes"
                         MSG_JSON = readJSON text: msgOut
                     }
@@ -67,7 +67,7 @@ pipeline {
                                     "body": "${escaped_msg}"
                                     }"""
                         httpRequest httpMode: 'POST', requestBody: body,
-                                    customHeaders: [[Authorization: "Bearer ${TOKEN}"]],
+                                customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
                                     url: "https://api.github.com/repos/BeanSmellers/BTJoystick/releases"
                     }
                 }
