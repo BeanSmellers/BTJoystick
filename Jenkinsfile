@@ -51,7 +51,7 @@ pipeline {
                         "target_commitish": "main",
                         "previous_tag_name": "${lastRelVer}"
                     }'
-                    curl -X post --data "\$DATA" -H "Authorization: Bearer \$TOKEN "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes\"""").trim()
+                    curl -X POST --data "\$DATA" -H "Authorization: Bearer \$TOKEN" "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes\"""").trim()
                         MSG_JSON = readJSON text: msgOut
                     }
                 }
@@ -65,7 +65,7 @@ pipeline {
                             "name": "${MSG_JSON['name']}",
                             "body": "${MSG_JSON['body']}"
                         }'
-                        curl -X post --data "\$DATA" -H "Authorization: Bearer \$TOKEN" "https://api.github.com/repos/BeanSmellers/BTJoystick/releases"
+                        curl -X POST --data "\$DATA" -H "Authorization: Bearer \$TOKEN" "https://api.github.com/repos/BeanSmellers/BTJoystick/releases"
                     """
                 }
             }
