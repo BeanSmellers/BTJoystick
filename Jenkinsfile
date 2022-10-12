@@ -53,7 +53,7 @@ pipeline {
                         def msgOut = httpRequest httpMode: 'POST', requestBody: body,
                                         customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
                                         url: "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes"
-                        MSG_JSON = readJSON text: msgOut
+                        MSG_JSON = readJSON text: msgOut.content
                     }
                 }
 
