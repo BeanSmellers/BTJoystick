@@ -61,7 +61,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
                     script {
                         def body = """{
-                                    "tag_name": "${NEXT_VER}"
+                                    "tag_name": "${NEXT_VER}",
                                     "target_commitish": "main",
                                     "name": "${MSG_JSON['name']}",
                                     "body": "${MSG_JSON['body']}"
