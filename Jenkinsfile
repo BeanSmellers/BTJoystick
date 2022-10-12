@@ -24,28 +24,20 @@ pipeline {
 
 
                     // Gets the latest tag following the format M.m.?, if none found, return M.m.0
-                    def currVersion = sh(returnStdout: true, script: """git describe --tags --abbrev=0 --match $confMaj.$confMin.* 2>/dev/null || echo $confMaj.$confMin.0""").trim()
-                    def (major, minor, patch) = currVersion.tokenize('.').collect { it.toInteger() }
-                    patch += 1  // Auto increment patch ver
-
-
-                    NEXT_VER = """$major.$minor.$patch"""
-                }
-
-                echo "Creating release version ${NEXT_VER}"
-
-                // Get current latest release
-                withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
-                    script {
-                        def output = sh(returnStdout: true, script: 'curl https://api.github.com/repos/BeanSmellers/BTJoystick/releases/latest')
-                        def latestJSON = readJSON text: output
-                        def lastRelVer = latestJSON['tag_name']
-
-                        echo """Current latest release version is: $lastRelVer"""
+                    def currVersion = sh(returnStdout: true, script: """git fetch --tags && git describe --tags --abbrev=0 --match $confMaj.$confMin.* 2>/dev/null""").trim()
+                    def (major, minor, patch) = [0, 0, 0]
+                    if (currVersion) {
+                        (major, minor, patch) = currVersion.tokenize('.').collect { it.toInteger() }
+                        patch += 1  // Auto increment patch ver
+                    } else {
+                        currVersion = """${confMaj}.${confMin}.0"""
+                        (major, minor, patch) = currVersion.tokenize('.').collect { it.toInteger() }
                     }
+                    NEXT_VER = """${major}.${minor}.${patch}"""
                 }
 
-                echo "Creating release..."
+
+                echo "Creating release version ${NEXT_VER}..."
                 withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
                     script {
                         def body = """{
