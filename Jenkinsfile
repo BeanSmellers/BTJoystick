@@ -1,5 +1,4 @@
 def NEXT_VER = ''
-def MSG_JSON
 
 pipeline {
     agent { label 'android' }
@@ -43,17 +42,6 @@ pipeline {
                         def lastRelVer = latestJSON['tag_name']
 
                         echo """Current latest release version is: $lastRelVer"""
-
-                        echo "Auto-generating release message..."
-                        def body = """{
-                                            "tag_name": "${NEXT_VER}",
-                                            "target_commitish": "main",
-                                            "previous_tag_name": "${lastRelVer}"
-                                            }"""
-                        def msgOut = httpRequest httpMode: 'POST', requestBody: body,
-                                        customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
-                                        url: "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes"
-                        MSG_JSON = readJSON text: msgOut.content
                     }
                 }
 
@@ -61,10 +49,9 @@ pipeline {
                 withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
                     script {
                         def body = """{
-                                    "tag_name": "${NEXT_VER}"
+                                    "tag_name": "${NEXT_VER}",
                                     "target_commitish": "main",
-                                    "name": "${MSG_JSON['name']}",
-                                    "body": "${MSG_JSON['body']}"
+                                    "generate_release_notes": true
                                     }"""
                         httpRequest httpMode: 'POST', requestBody: body,
                                 customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
