@@ -2,6 +2,10 @@ def NEXT_VER = ''
 
 pipeline {
     agent { label 'android' }
+    parameters {
+        booleanParam(name: 'DO_RELEASE', defaultValue: false, description: 'Create release on github')
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -15,7 +19,10 @@ pipeline {
         }
         stage('Release') {
             when {
-                branch 'main'
+                allOf {
+                    branch 'main'
+                    expression { return params.DO_RELEASE == true }
+                }
             }
             steps {
                 script {
