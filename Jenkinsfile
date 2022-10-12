@@ -36,20 +36,8 @@ pipeline {
                     NEXT_VER = """${major}.${minor}.${patch}"""
                 }
 
-                echo "Creating release version ${NEXT_VER}"
 
-                // Get current latest release
-                withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
-                    script {
-                        def output = sh(returnStdout: true, script: 'curl https://api.github.com/repos/BeanSmellers/BTJoystick/releases/latest')
-                        def latestJSON = readJSON text: output
-                        def lastRelVer = latestJSON['tag_name']
-
-                        echo """Current latest release version is: $lastRelVer"""
-                    }
-                }
-
-                echo "Creating release..."
+                echo "Creating release version ${NEXT_VER}..."
                 withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
                     script {
                         def body = """{
