@@ -64,7 +64,7 @@ pipeline {
                                     "tag_name": "${NEXT_VER}"
                                     "target_commitish": "main",
                                     "name": "${MSG_JSON['name']}",
-                                    "body": "${escaped_msg}"
+                                    "body": "${MSG_JSON['body']}"
                                     }"""
                         httpRequest httpMode: 'POST', requestBody: body,
                                 customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
