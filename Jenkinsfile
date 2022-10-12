@@ -36,22 +36,24 @@ pipeline {
                 echo "Creating release version ${NEXT_VER}"
 
                 // Get current latest release
-                script {
-                    def output = sh(returnStdout: true, script: 'curl https://api.github.com/repos/BeanSmellers/BTJoystick/releases/latest')
-                    def latestJSON = readJSON text: output
-                    def lastRelVer = latestJSON['tag_name']
+                withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                    script {
+                        def output = sh(returnStdout: true, script: 'curl https://api.github.com/repos/BeanSmellers/BTJoystick/releases/latest')
+                        def latestJSON = readJSON text: output
+                        def lastRelVer = latestJSON['tag_name']
 
-                    echo """Current latest release version is: $lastRelVer"""
+                        echo """Current latest release version is: $lastRelVer"""
 
-                    echo "Auto-generating release message..."
-                    def msgOut = sh(returnStdout: true, script: """#!/bin/bash
+                        echo "Auto-generating release message..."
+                        def msgOut = sh(returnStdout: true, script: """#!/bin/bash
                     DATA='{
                         "tag_name": "${NEXT_VER}",
                         "target_commitish": "main",
                         "previous_tag_name": "${lastRelVer}"
                     }'
-                    curl -X post --data "\$DATA" "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes\"""").trim()
-                    MSG_JSON = readJson text: msgOut
+                    curl -X post --data "\$DATA" -H "Authorization: Bearer \$TOKEN "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes\"""").trim()
+                        MSG_JSON = readJSON text: msgOut
+                    }
                 }
 
                 echo "Creating release..."
