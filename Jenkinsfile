@@ -45,13 +45,14 @@ pipeline {
                         echo """Current latest release version is: $lastRelVer"""
 
                         echo "Auto-generating release message..."
-                        def msgOut = sh(returnStdout: true, script: """#!/bin/bash
-                    DATA='{
-                        "tag_name": "${NEXT_VER}",
-                        "target_commitish": "main",
-                        "previous_tag_name": "${lastRelVer}"
-                    }'
-                    curl -X POST --data "\$DATA" -H "Authorization: Bearer \$TOKEN" "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes\"""").trim()
+                        def body = """{
+                                            "tag_name": "${NEXT_VER}",
+                                            "target_commitish": "main",
+                                            "previous_tag_name": "${lastRelVer}"
+                                            }"""
+                        def msgOut = httpRequest httpMode: 'POST', requestBody: body,
+                                        customHeaders: [[Authorization: "Bearer ${TOKEN}"]],
+                                        url: "https://api.github.com/repos/BeanSmellers/BTJoystick/releases/generate-notes"
                         MSG_JSON = readJSON text: msgOut
                     }
                 }
@@ -59,16 +60,15 @@ pipeline {
                 echo "Creating release..."
                 withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
                     script {
-                        def escaped_msg = MSG_JSON['body'].replace("'", "\\'") // Replace ' with \'
-                        sh """#!/bin/bash
-                        DATA='{
-                            "tag_name": "${NEXT_VER}",
-                            "target_commitish": "main",
-                            "name": "${MSG_JSON['name']}",
-                            "body": "${escaped_msg}"
-                        }'
-                        curl -X POST --data "\$DATA" -H "Authorization: Bearer \$TOKEN" "https://api.github.com/repos/BeanSmellers/BTJoystick/releases"
-                    """
+                        def body = """{
+                                    "tag_name": "${NEXT_VER}"
+                                    "target_commitish": "main",
+                                    "name": "${MSG_JSON['name']}",
+                                    "body": "${escaped_msg}"
+                                    }"""
+                        httpRequest httpMode: 'POST', requestBody: body,
+                                    customHeaders: [[Authorization: "Bearer ${TOKEN}"]],
+                                    url: "https://api.github.com/repos/BeanSmellers/BTJoystick/releases"
                     }
                 }
             }
