@@ -58,7 +58,8 @@ pipeline {
 
                 echo "Creating release..."
                 withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
-                    sh """#!/bin/bash
+                    script {
+                        sh """#!/bin/bash
                         DATA='{
                             "tag_name": "${NEXT_VER}",
                             "target_commitish": "main",
@@ -67,6 +68,7 @@ pipeline {
                         }'
                         curl -X POST --data "\$DATA" -H "Authorization: Bearer \$TOKEN" "https://api.github.com/repos/BeanSmellers/BTJoystick/releases"
                     """
+                    }
                 }
             }
         }
