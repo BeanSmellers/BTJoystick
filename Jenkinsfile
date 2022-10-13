@@ -52,9 +52,25 @@ pipeline {
                                     "target_commitish": "main",
                                     "generate_release_notes": true
                                     }"""
-                        httpRequest httpMode: 'POST', requestBody: body,
+                        def response = httpRequest httpMode: 'POST', requestBody: body,
                                 customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
                                     url: "https://api.github.com/repos/BeanSmellers/BTJoystick/releases"
+                        // Parse response json to get new release ID
+                        def relJSON = readJSON text: response.content
+
+                        echo "Uploading assets to release"
+                        httpRequest contentType: 'APPLICATION_OCTETSTREAM', httpMode: 'POST',
+                                customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
+                                uploadFile: './app/build/outputs/apk/release/app-release-unsigned.apk',
+                                multipartName: 'app-release.apk',
+                                url: "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets?name=app-release.apk"
+
+                        httpRequest contentType: 'APPLICATION_OCTETSTREAM', httpMode: 'POST',
+                                customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
+                                uploadFile: './app/build/outputs/apk/debug/app-debug.apk',
+                                multipartName: 'app-debug.apk',
+                                url: "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets?name=app-debug.apk"
+
                     }
                 }
             }
