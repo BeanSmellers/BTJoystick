@@ -37,8 +37,8 @@ pipeline {
                     def (confMaj, confMin) = gradleVersion.tokenize('.').collect { it.toInteger() }
 
 
-                    // Gets the latest tag following the format M.m.?, if none found, return M.m.0
-                    def currVersion = sh(returnStdout: true, script: """git fetch --tags && git describe --tags --abbrev=0 --match $confMaj.$confMin.* 2>/dev/null""").trim()
+                    // Gets the latest tag following the format M.m.?, if none found, return M.m.0 (don't fail pipeline if none found)
+                    def currVersion = sh(returnStdout: true, script: """git fetch --tags && git describe --tags --abbrev=0 --match $confMaj.$confMin.* 2>/dev/null || true""").trim()
                     def (major, minor, patch) = [0, 0, 0]
                     if (currVersion) {
                         (major, minor, patch) = currVersion.tokenize('.').collect { it.toInteger() }
