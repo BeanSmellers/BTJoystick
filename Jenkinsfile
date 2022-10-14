@@ -82,7 +82,7 @@ pipeline {
                         httpRequest contentType: 'APPLICATION_OCTETSTREAM', httpMode: 'POST',
                                 customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
                                 uploadFile: './app-signed.apk',
-                                multipartName: 'app-debug.apk',
+                                multipartName: 'app-signed.apk',
                                 url: "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets?name=app-signed.apk"
                     }
                 }
