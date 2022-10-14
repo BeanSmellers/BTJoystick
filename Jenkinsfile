@@ -72,6 +72,7 @@ pipeline {
 
                         // Upload signed release apk
                         sh "curl -s -X POST -H \"Authorization: Bearer $TOKEN\" -H \"Content-Type: application/vnd.android.package-archive\" --data-binary \"@app-signed.apk\" ${UPLOAD_URL}?name=app-signed.apk"
+
                     }
                 }
             }
