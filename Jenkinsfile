@@ -20,7 +20,7 @@ pipeline {
         stage('Pre-release') {
             steps {
                 sh 'keytool -genkey -v -keystore signing-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias test-key -noprompt -storepass testing -keypass testing -dname "CN=poum.ca, OU=ID, O=poum, L=Test, S=Test, C=CA"'
-                sh 'zipalign -v -p ./app/build/output/apk/release/app-release-unsigned.apk app-aligned.apk'
+                sh 'zipalign -v -p 4 ./app/build/output/apk/release/app-release-unsigned.apk app-aligned.apk'
                 sh 'apksigner sign -ks signing-key.jks --out app-signed.apk app-aligned.apk'
             }
         }
