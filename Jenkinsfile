@@ -66,24 +66,12 @@ pipeline {
                         def relJSON = readJSON text: response.content
 
                         echo "Uploading assets to release"
-                        httpRequest contentType: 'APPLICATION_OCTETSTREAM', httpMode: 'POST',
-                                customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
-                                uploadFile: './app/build/outputs/apk/release/app-release-unsigned.apk',
-                                multipartName: 'app-release.apk',
-                                url: "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets?name=app-release.apk"
-
-                        httpRequest contentType: 'APPLICATION_OCTETSTREAM', httpMode: 'POST',
-                                customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
-                                uploadFile: './app/build/outputs/apk/debug/app-debug.apk',
-                                multipartName: 'app-debug.apk',
-                                url: "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets?name=app-debug.apk"
+                        def UPLOAD_URL = "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets"
+                        sh "curl -s -X POST -H \"Authorization: Bearer $TOKEN\" -H \"Content-Type: application/vnd.android.package-archive\" --data-binary \"@app/build/outputs/apk/release/app-release-unsigned.apk\" ${UPLOAD_URL}?name=app-unsigned.apk"
+                        sh "curl -s -X POST -H \"Authorization: Bearer $TOKEN\" -H \"Content-Type: application/vnd.android.package-archive\" --data-binary \"@app/build/outputs/apk/debug/app-debug.apk\" ${UPLOAD_URL}?name=app-debug.apk"
 
                         // Upload signed release apk
-                        httpRequest contentType: 'APPLICATION_OCTETSTREAM', httpMode: 'POST',
-                                customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
-                                uploadFile: './app-signed.apk',
-                                multipartName: 'app-signed.apk',
-                                url: "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets?name=app-signed.apk"
+                        sh "curl -s -X POST -H \"Authorization: Bearer $TOKEN\" -H \"Content-Type: application/vnd.android.package-archive\" --data-binary \"@app-signed.apk\" ${UPLOAD_URL}?name=app-signed.apk"
                     }
                 }
             }
