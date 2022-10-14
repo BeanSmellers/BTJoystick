@@ -71,6 +71,15 @@ pipeline {
                                 multipartName: 'app-debug.apk',
                                 url: "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets?name=app-debug.apk"
 
+                        // Sign and upload release apk
+                        sh 'keytool -genkey -v -keystore signing-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias test-key -noprompt -storepass testing -keypass testing -dname "CN=poum.ca, OU=ID, O=poum, L=Test, S=Test, C=CA"'
+                        sh 'zipalign -v -p ./app/build/output/apk/release/app-release-unsigned.apk app-aligned.apk'
+                        sh 'apksigner sign -ks signing-key.jks --out app-signed.apk app-aligned.apk'
+                        httpRequest contentType: 'APPLICATION_OCTETSTREAM', httpMode: 'POST',
+                                customHeaders: [[name: 'Authorization', value: "Bearer ${TOKEN}"]],
+                                uploadFile: './app-signed.apk',
+                                multipartName: 'app-debug.apk',
+                                url: "https://uploads.github.com/repos/BeanSmellers/BTJoystick/releases/${relJSON['id']}/assets?name=app-signed.apk"
                     }
                 }
             }
@@ -79,12 +88,8 @@ pipeline {
 
     post {
         success {
-            sh 'keytool -genkey -v -keystore signing-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias test-key -noprompt -storepass testing -keypass testing -dname "CN=poum.ca, OU=ID, O=poum, L=Test, S=Test, C=CA"'
-            sh 'zipalign -v -p ./app/build/output/apk/release/app-release-unsigned.apk app-aligned.apk'
-            sh 'apksigner sign -ks signing-key.jks --out app-signed.apk app-aligned.apk'
-
             archiveArtifacts 'app/build/outputs/apk/**/*.apk'
-            archiveArtifacts 'app-aligned.apk'
+            archiveArtifacts 'app-signed.apk'
         }
     }
 }
